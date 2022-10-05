@@ -1,3 +1,4 @@
+from typing import Union
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from database.db import get_session
@@ -8,8 +9,14 @@ from sqlmodel import Session, select
 router = APIRouter(prefix="/cities", tags=["Cities"])
 
 
-@router.get("/", response_model=list[City])
-async def get_all_cities(session: Session = Depends(get_session)):
+@router.get("/", response_model=Union[list[City], City, str])
+async def get_all_cities(query: str | None = None, session: Session = Depends(get_session)):
+    if query:
+        stmt = select(City).where(City.name == query)
+        found_city = session.exec(stmt).first()
+        if found_city is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"City with query = {query} not found!")
+        return found_city
     cities = session.exec(select(City)).all()
     return cities
 
