@@ -69,19 +69,19 @@ async def patch_city_name_by_id(
     city_id: int = Path(title="City ID", description="Patch city name by ID"),
     session: Session = Depends(get_session),
 ) -> CityRead:
-    db_city = session.get(City, city_id)
-    if not db_city:
+    city_db = session.get(City, city_id)
+    if not city_db:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"City with ID = {city_id} was not found!",
         )
     city_data = city.dict(exclude_unset=True)
     for key, value in city_data.items():
-        setattr(db_city, key, value)
-    session.add(db_city)
+        setattr(city_db, key, value)
+    session.add(city_db)
     session.commit()
-    session.refresh(db_city)
-    return db_city
+    session.refresh(city_db)
+    return city_db
 
 
 @router.patch(
@@ -94,19 +94,19 @@ async def patch_city_name_by_id(
     ),
     session: Session = Depends(get_session),
 ) -> CityRead:
-    db_city = session.get(City, city_id)
-    if not db_city:
+    city_db = session.get(City, city_id)
+    if not city_db:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"City with ID = {city_id} was not found!",
         )
     city_data = city.dict(exclude_unset=True)
     for key, value in city_data.items():
-        setattr(db_city, key, value)
-    session.add(db_city)
+        setattr(city_db, key, value)
+    session.add(city_db)
     session.commit()
-    session.refresh(db_city)
-    return db_city
+    session.refresh(city_db)
+    return city_db
 
 
 @router.delete(
