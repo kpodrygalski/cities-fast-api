@@ -1,6 +1,5 @@
 from typing import Union
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
-from sqlalchemy import desc
 
 from database.db import get_session
 from models.city import City, CityRead, CityCreate, CityPatchName, CityPatchCapital
