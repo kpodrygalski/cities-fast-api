@@ -1,12 +1,15 @@
 # import uvicorn
 from fastapi import FastAPI
-from routes.cities_routes import router
-from middleware.test_middleware import TestMiddleware
+from fastapi.middleware.cors import CORSMiddleware
+from routes import cities_routes, heroes_routes, teams_routes
+
+origins = ["http://127.0.0.1:5173", "localhost:5173", "http://localhost:5173"]
 
 
 def setup_routes(route_app: FastAPI):
-    route_app.add_middleware(TestMiddleware)
-    route_app.include_router(router)
+    route_app.include_router(cities_routes.router)
+    route_app.include_router(teams_routes.router)
+    route_app.include_router(heroes_routes.router)
 
 
 def create_app() -> FastAPI:
@@ -16,6 +19,13 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # if __name__ == "__main__":
 #     app = create_app()

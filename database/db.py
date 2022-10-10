@@ -1,9 +1,11 @@
 from sqlmodel import Session, create_engine
-from models import city, hero, team
+from models.city import City
+from models.hero import Hero
+from models.team import Team
+from dotenv import dotenv_values, load_dotenv
 
-
-URL = "postgresql+psycopg2://minima:P$55word@192.168.8.192/cities_db"
-engine = create_engine(URL, echo=True)
+config = dotenv_values(".env")
+engine = create_engine(config["PSQL_URL"], echo=True)
 
 
 # Dependency
@@ -13,9 +15,9 @@ def get_session():
 
 
 def create_tables():
-    city.City.metadata.create_all(engine)
-    hero.Hero.metadata.create_all(engine)
-    team.Team.metadata.create_all(engine)
+    City.metadata.create_all(engine)
+    Team.metadata.create_all(engine)
+    Hero.metadata.create_all(engine)
 
 
 create_tables()
