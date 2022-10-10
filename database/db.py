@@ -1,5 +1,6 @@
 from sqlmodel import Session, create_engine
-from models.city import City
+from models import city, hero, team
+
 
 URL = "postgresql+psycopg2://minima:P$55word@192.168.8.192/cities_db"
 engine = create_engine(URL, echo=True)
@@ -12,7 +13,9 @@ def get_session():
 
 
 def create_tables():
-    City.metadata.create_all(engine)
+    city.City.metadata.create_all(engine)
+    hero.Hero.metadata.create_all(engine)
+    team.Team.metadata.create_all(engine)
 
 
 create_tables()

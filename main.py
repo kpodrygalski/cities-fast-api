@@ -1,9 +1,11 @@
 # import uvicorn
 from fastapi import FastAPI
 from routes.cities_routes import router
+from middleware.test_middleware import TestMiddleware
 
 
 def setup_routes(route_app: FastAPI):
+    route_app.add_middleware(TestMiddleware)
     route_app.include_router(router)
 
 

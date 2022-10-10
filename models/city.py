@@ -9,7 +9,7 @@ class CityBase(SQLModel):
 
 
 class City(CityBase, table=True):
-    __tablename__: str = 'cities'
+    __tablename__: str = "cities"
 
     id: Optional[int] = Field(default=None, primary_key=True, index=True)
 

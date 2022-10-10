@@ -1,5 +1,5 @@
 from typing import Union
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, Request, HTTPException, status
 
 from database.db import get_session
 from models.city import City, CityRead, CityCreate, CityPatchName, CityPatchCapital
@@ -10,12 +10,17 @@ router = APIRouter(prefix="/cities", tags=["Cities"])
 
 
 @router.get("/", response_model=Union[list[City], City, str])
-async def get_all_cities(query: str | None = None, session: Session = Depends(get_session)):
+async def get_all_cities(
+        query: str | None = None, session: Session = Depends(get_session)
+):
     if query:
         stmt = select(City).where(City.name == query)
         found_city = session.exec(stmt).first()
         if found_city is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"City with query = {query} not found!")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"City with query = {query} not found!",
+            )
         return found_city
     cities = session.exec(select(City)).all()
     return cities
@@ -32,22 +37,29 @@ async def get_city_by_id(city_id: int, session: Session = Depends(get_session)):
     return city
 
 
-@router.post('/', response_model=CityRead, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=CityRead, status_code=status.HTTP_201_CREATED)
 async def create_new_city(city: CityCreate, session: Session = Depends(get_session)):
     db_city = City.from_orm(city)
     if not db_city:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Something went wrong!')
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Something went wrong!"
+        )
     session.add(db_city)
     session.commit()
     session.refresh(db_city)
     return db_city
 
 
-@router.patch('/{city_id}/name', response_model=CityRead)
-async def patch_city_name_by_id(city_id: int, city: CityPatchName, session: Session = Depends(get_session)):
+@router.patch("/{city_id}/name", response_model=CityRead)
+async def patch_city_name_by_id(
+        city_id: int, city: CityPatchName, session: Session = Depends(get_session)
+):
     db_city = session.get(City, city_id)
     if not db_city:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"City with ID = {city_id} was not found!")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"City with ID = {city_id} was not found!",
+        )
     city_data = city.dict(exclude_unset=True)
     for key, value in city_data.items():
         setattr(db_city, key, value)
@@ -57,11 +69,16 @@ async def patch_city_name_by_id(city_id: int, city: CityPatchName, session: Sess
     return db_city
 
 
-@router.patch('/{city_id}/capital', response_model=CityRead)
-async def patch_city_name_by_id(city_id: int, city: CityPatchCapital, session: Session = Depends(get_session)):
+@router.patch("/{city_id}/capital", response_model=CityRead)
+async def patch_city_name_by_id(
+        city_id: int, city: CityPatchCapital, session: Session = Depends(get_session)
+):
     db_city = session.get(City, city_id)
     if not db_city:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"City with ID = {city_id} was not found!")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"City with ID = {city_id} was not found!",
+        )
     city_data = city.dict(exclude_unset=True)
     for key, value in city_data.items():
         setattr(db_city, key, value)
@@ -71,11 +88,16 @@ async def patch_city_name_by_id(city_id: int, city: CityPatchCapital, session: S
     return db_city
 
 
-@router.delete('/{city_id}', response_model=None, status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{city_id}", response_model=None, status_code=status.HTTP_204_NO_CONTENT
+)
 async def delete_city_by_id(city_id: int, session: Session = Depends(get_session)):
     city = session.get(City, city_id)
     if not city:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"City with ID = {city_id} was not found!")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"City with ID = {city_id} was not found!",
+        )
     session.delete(city)
     session.commit()
     return None
